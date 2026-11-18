@@ -10,12 +10,16 @@ export type Block =
   | { kind: 'code'; lang: string; text: string }
   | { kind: 'table'; header: string[]; rows: string[][] }
 
-// |---|:---:| 같은 구분선
-const SEPARATOR = /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$/
-
 // "| a | b |" 한 줄을 칸 배열로
 function cells(line: string): string[] {
   return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim())
+}
+
+// |---|:---:| 같은 구분선인지: 칸마다 :?-{3,}:? 인지 본다 (정규식 중첩 없이 선형으로)
+function isSeparator(line: string): boolean {
+  if (line.length > 500 || !line.includes('-')) return false
+  const row = cells(line)
+  return row.length > 0 && row.every((c) => /^:?-{3,}:?$/.test(c))
 }
 // checked: 체크박스 항목이면 true/false, 일반 항목이면 null
 export type ListItem = { text: string; checked: boolean | null }
@@ -86,7 +90,7 @@ export function parseBlocks(source: string): Block[] {
       continue
     }
     // 표: 머리줄 다음에 |---| 구분선이 오면 그 아래 | 로 된 줄을 모두 행으로 본다
-    if (line.includes('|') && SEPARATOR.test(lines[i + 1] ?? '')) {
+    if (line.includes('|') && isSeparator(lines[i + 1] ?? '')) {
       flush()
       const rows = [cells(line)]
       for (i += 2; i < lines.length && lines[i].includes('|') && lines[i].trim() !== ''; i++) rows.push(cells(lines[i]))
