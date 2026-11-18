@@ -1,0 +1,708 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --accent: #7c5cff;
+  --accent-soft: color-mix(in srgb, #7c5cff 16%, transparent);
+  --surface: color-mix(in srgb, CanvasText 5%, Canvas);
+  --surface-hover: color-mix(in srgb, CanvasText 9%, Canvas);
+  --border: color-mix(in srgb, CanvasText 14%, transparent);
+  --muted: color-mix(in srgb, CanvasText 60%, transparent);
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* .pane 의 display 가 hidden 을 덮지 않도록 */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: Canvas;
+  color: CanvasText;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shell {
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #8b6cff, #5b3fd9);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+h1 {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.vault-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vault-list li {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+
+button:hover {
+  background: var(--surface-hover);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.pick {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pick::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--dot, var(--muted));
+  flex: none;
+}
+
+.pick[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.pick[aria-pressed='true']::before {
+  background: var(--dot, var(--accent));
+}
+
+.pick[aria-pressed='true'] {
+  border-color: var(--dot, var(--accent));
+  background: color-mix(in srgb, var(--dot, #7c5cff) 18%, transparent);
+}
+
+.remove {
+  color: #f59e0b;
+}
+
+.remove:hover {
+  color: #ef6f8a;
+  border-color: color-mix(in srgb, #ef6f8a 45%, transparent);
+}
+
+.add {
+  display: flex;
+  gap: 6px;
+}
+
+.add input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.add input::placeholder {
+  color: var(--muted);
+}
+
+.add button[type='submit'] {
+  background: linear-gradient(135deg, #22b8a6, #7c5cff);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+
+.add button[type='submit']:hover {
+  filter: brightness(1.08);
+}
+
+.status {
+  margin: 0;
+  min-height: 1em;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.empty {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.notes h2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* 탐색기 스타일 행: 화살표, 아이콘, 이름이 한 줄에 놓인다. */
+.node {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 4px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.node .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.node svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.node .chev,
+.node .chev-spacer {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+
+.node .chev-spacer {
+  display: inline-block;
+}
+
+.folder[aria-expanded='true'] .chev {
+  transform: rotate(90deg);
+}
+
+.folder .ico-closed {
+  color: #e8b64c;
+}
+
+.folder .ico-open {
+  color: #e8b64c;
+  display: none;
+}
+
+.folder[aria-expanded='true'] .ico-open {
+  display: block;
+}
+
+.folder[aria-expanded='true'] .ico-closed {
+  display: none;
+}
+
+.note .ico {
+  color: #7a93b0;
+}
+
+.node:hover {
+  background: var(--surface-hover);
+}
+
+/* 볼트 목록과 노트 목록을 카드로 나눈다. */
+.pane {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pane-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.notes-pane {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.notes-vault {
+  margin: -4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.notes-vault:empty {
+  display: none;
+}
+
+
+/* 볼트 카드는 기본으로 접혀 있다 (details 에 open 없음). 노트 카드는 기본으로 펼쳐진다. */
+.pane > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.pane > summary::-webkit-details-marker {
+  display: none;
+}
+
+.pane > summary::before {
+  content: '▸';
+  display: inline-block;
+  width: 10px;
+  transition: transform 0.15s;
+}
+
+.pane[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.pane > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 아이콘 버튼: 선 아이콘(SVG)을 현재 글자색으로 그린다. */
+.add-btn,
+.remove {
+  width: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.add-btn svg,
+.remove svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* 삭제 확인 줄: 문구와 두 버튼이 한 줄에 들어간다. */
+.vault-list li.confirm {
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, #ef6f8a 45%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, #ef6f8a 10%, transparent);
+}
+
+.confirm-text {
+  flex: 1 1 100%;
+  font-size: 12px;
+}
+
+.confirm-yes {
+  color: #fff;
+  background: #ef6f8a;
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.confirm-no {
+  color: var(--muted);
+}
+
+/* 우클릭 메뉴와 새 항목 입력줄 */
+.ctx {
+  position: fixed;
+  z-index: 10;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  background: Canvas;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.ctx button {
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.ctx button:hover {
+  background: var(--surface-hover);
+}
+
+.new-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* 볼트 이름 : 경로 한 줄. 경로는 흐리게, 길면 줄임. */
+.notes-vault {
+  margin: -4px 0 0;
+  font-size: 13px;
+  display: flex;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.nv-name {
+  font-weight: 600;
+  flex: none;
+}
+
+.nv-path {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  align-self: center;
+}
+
+/* 노트 보기 (읽기 전용) */
+.viewer {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewer-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viewer-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-close {
+  width: 28px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.viewer-body {
+  font-size: 13px;
+  line-height: 1.55;
+  max-height: 420px;
+  overflow: auto;
+}
+
+.viewer-body h1 {
+  margin: 12px 0 6px;
+  font-size: 22px;
+}
+
+.viewer-body h2 {
+  margin: 12px 0 6px;
+  font-size: 19px;
+}
+
+.viewer-body h3 {
+  margin: 10px 0 4px;
+  font-size: 16px;
+}
+
+.viewer-body h4,
+.viewer-body h5,
+.viewer-body h6 {
+  margin: 8px 0 4px;
+  font-size: 14px;
+}
+
+.viewer-body p {
+  margin: 4px 0;
+  white-space: pre-line;
+}
+
+.viewer-body ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.viewer-body pre {
+  margin: 6px 0;
+  padding: 8px;
+  overflow: auto;
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.viewer-body code {
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--surface);
+}
+
+.viewer-body .wiki {
+  color: #7c5cff;
+  font-weight: 600;
+}
+
+/* Obsidian 설치 상태와 편집 버튼 */
+.obs-status {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #22b8a6;
+}
+
+.obs-status.missing {
+  color: var(--muted);
+}
+
+
+
+/* F2 도움말 팝업 */
+.help {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.help[hidden] {
+  display: none;
+}
+
+.help-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 14px;
+  background: Canvas;
+  color: CanvasText;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.help-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.help-title {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+}
+
+.help-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.help-keys {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 체크박스 항목: 기본 점 대신 상자 */
+.viewer-body li.task {
+  list-style: none;
+  margin-left: -18px;
+}
+
+.viewer-body li.task input {
+  margin: 0 6px 0 0;
+  vertical-align: middle;
+}
+
+/* #태그: 알약 모양 */
+.viewer-body .tag {
+  display: inline-block;
+  padding: 0 6px;
+  margin: 0 2px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: color-mix(in srgb, #7c5cff 18%, transparent);
+  color: #7c5cff;
+}
+
+/* 코드 블록 색칠 (highlight.ts 의 토큰 종류) */
+.viewer-body .tok-comment {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.viewer-body .tok-string {
+  color: #a5d6a7;
+}
+
+.viewer-body .tok-key {
+  color: #7cc7ff;
+}
+
+.viewer-body .tok-number {
+  color: #f0b26b;
+}
+
+.viewer-body .tok-keyword {
+  color: #c792ea;
+}
+
+.viewer-body .tok-constant {
+  color: #ff7b72;
+}
+
+.viewer-body .tok-func {
+  color: #dcbb6b;
+}
+
+.viewer-body .tok-type {
+  color: #4ec9b0;
+}
+
+/* 표 */
+.viewer-body table {
+  border-collapse: collapse;
+  margin: 6px 0;
+  font-size: 12px;
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+}
+
+.viewer-body th,
+.viewer-body td {
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.viewer-body th {
+  background: var(--surface);
+  font-weight: 600;
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obsidian for Orca</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="header">
+      <div class="logo" aria-hidden="true">O</div>
+      <div>
+        <h1>Obsidian</h1>
+        <p class="subtitle" data-i18n="subtitle">Pick a vault, then browse its notes</p>
+        <p id="obsidian-status" class="obs-status" hidden></p>
+      </div>
+    </header>
+
+    <details class="pane vaults-pane">
+      <summary class="pane-title">Vaults</summary>
+      <ul id="vault-list" class="vault-list"></ul>
+      <form id="vault-form" class="add">
+        <input id="vault-path" type="text" placeholder="C:\path\to\vault" autocomplete="off" data-i18n-aria="path_label" aria-label="Vault folder path">
+        <button type="submit" class="add-btn" data-i18n-title="add" data-i18n-aria="add" title="Add vault" aria-label="Add vault"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 10v6"/><path d="M9 13h6"/><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></button>
+      </form>
+    </details>
+
+    <details id="notes" class="pane notes-pane" open hidden>
+      <summary class="pane-title">Notes</summary>
+      <p id="notes-vault" class="notes-vault"></p>
+      <ul id="tree" class="tree"></ul>
+      <section id="viewer" class="viewer" aria-label="Note" hidden>
+        <div class="viewer-head">
+          <span id="viewer-title" class="viewer-title"></span>
+          <button id="viewer-close" type="button" class="viewer-close" data-i18n-title="close_note" data-i18n-aria="close_note" title="Close note" aria-label="Close note">×</button>
+        </div>
+        <article id="viewer-body" class="viewer-body"></article>
+      </section>
+    </details>
+
+    <p id="status" class="status" role="status"></p>
+  </main>
+  <div id="ctx" class="ctx" role="menu" hidden>
+    <button type="button" role="menuitem" data-kind="folder" data-i18n="new_folder">New folder</button>
+    <button type="button" role="menuitem" data-kind="note" data-i18n="new_note">New note (.md)</button>
+  </div>
+  <div id="help" class="help" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+    <div class="help-card">
+      <div class="help-head">
+        <h2 id="help-title" class="help-title" data-i18n="help_title">Help</h2>
+        <button id="help-close" type="button" class="viewer-close" data-i18n-title="close" data-i18n-aria="close" title="Close" aria-label="Close">×</button>
+      </div>
+      <ul class="help-list">
+        <li data-i18n="help_vault"></li>
+        <li data-i18n="help_notes"></li>
+        <li data-i18n="help_context"></li>
+      </ul>
+      <p class="help-keys" data-i18n="help_keys"></p>
+    </div>
+  </div>
+  <script type="module" src="../src/panel.ts"></script>
+</body>
+</html>

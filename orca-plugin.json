@@ -1,0 +1,54 @@
+{
+  "manifestVersion": 2,
+  "id": "obsidian-for-orca",
+  "name": "Obsidian for Orca",
+  "version": "0.1.0",
+  "description": "Browse and read your Obsidian vaults from the Orca sidebar.",
+  "license": "MIT",
+  "repository": "https://github.com/vrwolf1004/orca-obsidian",
+  "author": {
+    "name": "vrwolf1004"
+  },
+  "engines": {
+    "orca": ">=1.4.246"
+  },
+  "pluginApi": 1,
+  "execution": "trusted-worker",
+  "main": "src/worker.ts",
+  "contributes": {
+    "panels": [
+      {
+        "id": "obsidian",
+        "title": "Obsidian",
+        "entry": "panel/index.html"
+      }
+    ]
+  },
+  "capabilities": [
+    {
+      "kind": "storage:own"
+    }
+  ],
+  "icon": "docs/store/icon.png",
+  "cover": {
+    "path": "docs/store/cover.webp",
+    "alt": "Obsidian for Orca panel with a vault open and a note shown beside the app title"
+  },
+  "screenshots": [
+    {
+      "path": "docs/store/screenshot-1.webp",
+      "alt": "Right-click menu on a folder with New folder and New note",
+      "caption": "Create folders and notes in place"
+    },
+    {
+      "path": "docs/store/screenshot-2.webp",
+      "alt": "Help popup listing the shortcuts",
+      "caption": "Ctrl+H help, F2 language"
+    },
+    {
+      "path": "docs/store/screenshot-3.webp",
+      "alt": "Vaults section expanded with the add and remove buttons",
+      "caption": "Add and remove vault folders"
+    }
+  ]
+}
