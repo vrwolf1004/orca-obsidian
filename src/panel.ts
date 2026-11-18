@@ -356,7 +356,6 @@ async function openNote(root: string, entry: Entry): Promise<void> {
     viewer.hidden = false
     viewer.scrollIntoView({ block: 'start' })
   } catch (error) {
-    console.error('open note failed', error)
     say(t('err_note'))
   }
 }
