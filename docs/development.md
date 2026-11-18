@@ -1,7 +1,7 @@
 # 개발 절차
 
 ```text
-ORCA="C:\Users\PC\AppData\Local\Programs\orca\resources\bin\orca.exe"
+ORCA="$LOCALAPPDATA\Programs\orca\resources\bin\orca.exe"
 ```
 
 ## 1. 매니페스트 검증
