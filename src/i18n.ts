@@ -253,10 +253,6 @@ export type Key = keyof typeof ko
 const LANGS = Object.keys(STRINGS) as Lang[]
 let current: Lang = LANGS.find((l) => (navigator.language || '').toLowerCase().startsWith(l)) ?? 'en'
 
-export function getLang(): Lang {
-  return current
-}
-
 // 저장된 언어를 정한다 (패널이 시작할 때 storage 에서 읽는다)
 export function setLang(lang: string): void {
   if ((LANGS as string[]).includes(lang)) current = lang as Lang

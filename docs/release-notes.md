@@ -1,5 +1,9 @@
 # Release notes
 
+## 0.5.2
+
+- Remove unused code (`getLang`).
+
 ## 0.5.1
 
 - Bigger checkboxes with an accent color.
