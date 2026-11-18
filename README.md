@@ -41,6 +41,8 @@ It does not send data over the network, and it does not write to the vault excep
 ## Known limits
 
 - Images, links `[text](url)` and numbered-list renumbering are not rendered yet.
+- Table column alignment is ignored; tables are always left-aligned.
+- `[[wikilinks]]` and `#tags` are highlighted but not clickable yet.
 - Syntax highlighting is approximate: it uses keyword lists, not full language grammars.
 - Notes are read-only in the panel. Editing is done in Obsidian or your own editor.
 

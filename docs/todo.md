@@ -5,39 +5,52 @@
 ## 기본 골격
 
 - [x] 매니페스트 `orca-plugin.json` (id `obsidian-for-orca`, 표시 이름 `Obsidian for Orca`)
-- [x] 패널 자리표시자 (`panel/index.html`)
+- [x] 패널 구성: 볼트 목록, 노트 트리, 노트 보기 (`panel/index.html`, `src/panel.ts`)
 - [x] MIT 라이선스, `.gitignore`
 - [x] `orca plugin validate` 통과
 - [x] 볼트 등록과 목록 선택: 경로 입력, 추가, 선택, 삭제 (`src/vaults.ts`, 상태는 storage:own 에 저장)
-- [ ] 볼트 폴더 존재 확인 (샌드박스 패널은 파일을 못 보므로 worker 필요)
-- [ ] 패널에서 추가 버튼 클릭 흐름을 Orca 안에서 직접 확인
-- [ ] 볼트 폴더 트리 표시 (herdr-obsidian 0.5.0 기능 참고)
-- [ ] Markdown 읽기 표시
-- [ ] 편집과 자동 저장 (herdr-obsidian 과 같은 방식: 임시 파일 후 이름 바꾸기, 외부 변경 감지)
-- [ ] 필요한 capability 확정 후 `capabilities` 에 추가하고 README 권한 절 갱신
+- [x] 볼트 폴더 트리 표시: 폴더 펼치기·접기, 노트 아이콘 (워커 `vault.list`)
+- [x] Markdown 읽기 표시: 제목, 목록, 체크박스, 표, 코드 블록, 굵게, 기울임, 인라인 코드, `[[위키링크]]`, `#태그` (`src/markdown.ts`)
+- [x] 코드 색칠: JSON, JavaScript, Java, SQL 키워드와 주석, 문자열, 숫자, 함수, 타입 (`src/highlight.ts`)
+- [x] 우클릭으로 새 폴더, 새 노트(.md) 만들기 (워커 `vault.create`, 같은 이름은 덮어쓰지 않음)
+- [x] 노트 목록에서 볼트 이름과 실제 경로 표시
+- [x] Obsidian 설치 여부 표시 (`%LOCALAPPDATA%` 대신 홈 폴더 기준 경로)
+- [ ] 편집과 자동 저장: 지금은 읽기 전용이다. 필요하면 다시 검토
+- [ ] 볼트 폴더 존재 확인: 지금은 목록을 읽을 때 실패 메시지로 확인
 
 ## 다국어
 
-- [ ] 패널 문구 언어 정하기 (herdr-obsidian 처럼 en, ko, ru, fr, es, de, ja 를 목표로 할지 결정)
+- [x] 7개 언어: 영어, 한국어, 일본어, 독일어, 스페인어, 프랑스어, 러시아어 (`src/i18n.ts`)
+- [x] 언어는 브라우저 언어를 따르고, F2 로 바꾸면 저장된다
+- [x] "Vaults", "Notes" 제목은 모든 언어에서 영어로 고정
+- [ ] 번역 원어민 검수 (일본어, 독일어, 스페인어, 프랑스어, 러시아어)
 
 ## 테스트
 
-- [x] 단위 테스트 `node --test tests/vaults.test.ts` (4개 통과)
-- [ ] 샘플 볼트 준비
-- [ ] 로직 단위 테스트 (트리 구성, 읽기·쓰기)
-- [ ] Orca 안에서 패널 동작 확인 (`plugin dev load` 후 사람이 직접)
+- [x] 단위 테스트: vaults, tree, names, markdown, table, highlight, i18n (`node --test tests/*.test.ts`)
+- [x] 헤드리스 Chrome 으로 패널 동작 확인: 볼트 추가, 노트 열기, 우클릭 생성, Ctrl+H, F2
+- [ ] Orca 안에서 패널 동작 직접 확인 (아래 "실제 Orca 확인 목록" 참고)
 
-## 배포 (orca-radio, orca-tetris 에서 얻은 교훈)
+## 배포
 
-- [ ] 저장소 공개 생성 (`vrwolf1004/orca-obsidian`), 토픽 `orca-plugin` (사용자 확인 후 진행)
-- [ ] 아이콘 512×512 (`docs/store/icon.png`, 256KB 이하)
-- [ ] 대표 이미지 1600×1000 WebP (`docs/store/cover.webp`, 1024KB 이하)
-- [ ] 스크린샷 2560×1600 WebP, 최소 1280×800 (`docs/store/`), 1536KB 이하
-- [ ] `plugin inspect` 로 파일 수와 용량 확인 (기준: 1MB 이하)
-- [ ] README 영문·한글 최종 점검, 권한 설명 포함
-- [ ] 태그 `v0.1.0` 푸시 (목록 반영까지 최대 1시간)
-- [ ] 상태 페이지에서 검토 상태 확인 (`Under review` 이면 검토 중)
-- [ ] 수동 설치 주소 `https://github.com/vrwolf1004/orca-obsidian#v0.1.0` 으로 설치 확인
+- [x] 저장소 공개: `vrwolf1004/orca-obsidian`
+- [x] 토픽 `orca-plugin`
+- [x] 아이콘 512×512 PNG (`docs/store/icon.png`)
+- [x] 대표 이미지 1600×1000 WebP (`docs/store/cover.webp`)
+- [x] 스크린샷 1600×1000 WebP 3장 (`docs/store/screenshot-*.webp`, 헤드리스 Chrome 으로 찍음)
+- [x] README 영문·한글: 기능, 요구 사항, 권한, 알려진 제한, 후원
+- [x] 태그 `v0.1.0`, `v0.5.0` 푸시 (현재 버전 0.5.0)
+- [x] 릴리스 노트 `docs/release-notes.md`
+- [ ] 인덱서 반영 확인: 상태 페이지에서 목록 노출과 검토 상태 확인 (`Under review` 이면 검토 중)
+- [ ] 설치 주소 `https://github.com/vrwolf1004/orca-obsidian#v0.5.0` 으로 설치 확인
+
+## 실제 Orca 확인 목록
+
+- [ ] 볼트 추가, 선택, 삭제
+- [ ] 노트 열기: 표, 체크박스, 코드 색칠, `#태그` 보기
+- [ ] 우클릭으로 새 폴더, 새 노트 만들기
+- [ ] Ctrl+H 도움말, F2 언어 변경
+- [ ] 스토어 스크린샷을 Orca 실제 화면으로 다시 찍기
 
 ## 개선 제안
 
@@ -51,6 +64,4 @@
 - [ ] 코드 색칠: 언어별 키워드를 더 맞추고, JSX 태그와 Java 제네릭을 다룬다
 - [ ] 체크박스: 테마에 맞춘 색을 확인한다
 - [ ] 권한: `trusted-worker`는 사용자 계정 권한으로 실행된다. 샌드박스로 할 수 있는 범위를 다시 검토한다
-- [ ] 실제 Orca 확인 목록: 볼트 추가, 노트 열기, 우클릭 생성, 표·체크박스·태그 보기, Ctrl+H, F2 언어 변경을 Orca 안에서 한 번씩 눌러 확인한다
-- [ ] 스토어 스크린샷: 헤드리스 Chrome 대신 Orca 실제 화면으로 다시 찍는다
-- [ ] 번역 검수: 일본어, 독일어, 스페인어, 프랑스어, 러시아어를 원어민이 확인한다
+- [ ] Obsidian 열기: `obsidian://` 주소 방식으로 편집 기능을 다시 검토한다 (이전에 제거)

@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.5.1
+
+- Bigger checkboxes with an accent color.
+- Remove unused CSS and a debug log line.
+- Docs: todo, development guide, and README known limits updated.
+
 ## 0.5.0
 
 - Read Markdown: tables, highlighted code blocks (JSON, JavaScript, Java, SQL and common keywords), `#tags` as pills.
