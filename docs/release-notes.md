@@ -1,5 +1,10 @@
 # Release notes
 
+## 0.6.2
+
+- Clicking a #tag in a note opens the SEARCH tab with that tag.
+- While a binder tab is open, the MD view is dimmed; clicking it still closes the tab.
+
 ## 0.6.1
 
 - Folder picker: works when no vault is registered; the VAULTS tab opens by default when the list is empty; spinner until the folder dialog appears.

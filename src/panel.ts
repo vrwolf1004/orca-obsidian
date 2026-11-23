@@ -579,7 +579,11 @@ function renderInline(text: string): Node[] {
     }
     if (part.kind === 'tag') {
       // 태그를 누르면 SEARCH 에 그 태그를 넣고 찾는다
-      el.addEventListener('click', () => {
+      el.addEventListener('click', (event) => {
+        // SEARCH 탭을 펼쳐 보여 주고, MD 클릭으로 접히는 동작은 막는다
+        event.stopPropagation()
+        setCollapsed(false)
+        showTab('search')
         searchInput.value = part.text
         void runSearch()
       })

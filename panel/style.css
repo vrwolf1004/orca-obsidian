@@ -861,3 +861,12 @@ input:focus-visible {
   opacity: 0;
   visibility: hidden;
 }
+
+/* 탭 패널이 열려 있으면 MD 를 흐리게 (눌러서 닫을 수 있도록 클릭은 그대로 둔다) */
+.details-pane {
+  transition: opacity 0.2s ease;
+}
+
+.stage:has(.binder:not(.collapsed)) ~ .details-pane {
+  opacity: 0.35;
+}
