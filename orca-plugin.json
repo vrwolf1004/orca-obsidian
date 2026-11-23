@@ -2,7 +2,7 @@
   "manifestVersion": 2,
   "id": "obsidian-for-orca",
   "name": "Obsidian for Orca",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Browse and read your Obsidian vaults from the Orca sidebar.",
   "license": "MIT",
   "repository": "https://github.com/vrwolf1004/orca-obsidian",
@@ -32,13 +32,13 @@
   "icon": "docs/store/icon.png",
   "cover": {
     "path": "docs/store/cover.webp",
-    "alt": "Obsidian for Orca panel with a vault open and a note shown beside the app title"
+    "alt": "Obsidian for Orca with the note graph behind the vertical tabs and a note below"
   },
   "screenshots": [
     {
       "path": "docs/store/screenshot-1.webp",
-      "alt": "Right-click menu on a folder with New folder and New note",
-      "caption": "Create folders and notes in place"
+      "alt": "Notes tab with a folder tree and the Markdown view below",
+      "caption": "Browse folders and read notes"
     },
     {
       "path": "docs/store/screenshot-2.webp",
@@ -47,8 +47,8 @@
     },
     {
       "path": "docs/store/screenshot-3.webp",
-      "alt": "Vaults section expanded with the add and remove buttons",
-      "caption": "Add and remove vault folders"
+      "alt": "Vaults tab open over the note graph",
+      "caption": "Add and switch vaults"
     }
   ]
 }

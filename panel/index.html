@@ -17,27 +17,51 @@
       </div>
     </header>
 
-    <details class="pane vaults-pane">
-      <summary class="pane-title">Vaults</summary>
-      <ul id="vault-list" class="vault-list"></ul>
-      <form id="vault-form" class="add">
-        <input id="vault-path" type="text" placeholder="C:\path\to\vault" autocomplete="off" data-i18n-aria="path_label" aria-label="Vault folder path">
-        <button type="submit" class="add-btn" data-i18n-title="add" data-i18n-aria="add" title="Add vault" aria-label="Add vault"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 10v6"/><path d="M9 13h6"/><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></button>
-      </form>
-    </details>
+    <div class="stage">
+      <div class="graph-bg">
+        <svg id="graph" class="graph" viewBox="0 0 320 320" role="img" aria-label="Note graph"></svg>
+      </div>
 
-    <details id="notes" class="pane notes-pane" open hidden>
-      <summary class="pane-title">Notes</summary>
-      <p id="notes-vault" class="notes-vault"></p>
-      <ul id="tree" class="tree"></ul>
-      <section id="viewer" class="viewer" aria-label="Note" hidden>
-        <div class="viewer-head">
-          <span id="viewer-title" class="viewer-title"></span>
-          <button id="viewer-close" type="button" class="viewer-close" data-i18n-title="close_note" data-i18n-aria="close_note" title="Close note" aria-label="Close note">×</button>
-        </div>
-        <article id="viewer-body" class="viewer-body"></article>
-      </section>
-    </details>
+    <div class="binder collapsed">
+      <nav class="binder-tabs" role="tablist" aria-label="Sections">
+        <button type="button" role="tab" class="binder-tab" data-tab="vaults" aria-selected="true">VAULTS</button>
+        <button type="button" role="tab" class="binder-tab" data-tab="search" aria-selected="false">SEARCH</button>
+        <button type="button" role="tab" class="binder-tab" data-tab="notes" aria-selected="false">NOTES</button>
+      </nav>
+
+      <div class="binder-body">
+        <section id="tab-vaults" class="pane vaults-pane" role="tabpanel">
+          <ul id="vault-list" class="vault-list"></ul>
+          <button id="pick-folder" type="button" class="pick-folder" data-i18n="pick_folder">Pick a folder…</button>
+        </section>
+
+        <section id="tab-search" class="notes-tab" role="tabpanel" hidden>
+          <section class="pane search-pane" aria-labelledby="search-title">
+            <h2 id="search-title" class="pane-title">Search</h2>
+              <input id="search-input" type="search" class="search-input" autocomplete="off" data-i18n-placeholder="search_placeholder" data-i18n-aria="search_placeholder" placeholder="Search notes..." aria-label="Search notes...">
+              <ul id="search-results" class="tree"></ul>
+            </section>
+        </section>
+
+        <section id="tab-notes" class="notes-tab" role="tabpanel" hidden>
+          <section id="notes" class="pane notes-pane" hidden>
+            <h2 id="notes-title" class="pane-title">Notes</h2>
+            <p id="notes-path" class="notes-path"></p>
+            <ul id="tree" class="tree"></ul>
+          </section>
+        </section>
+      </div>
+    </div>
+    </div>
+
+    <section id="viewer" class="pane details-pane" aria-labelledby="details-title" hidden>
+      <div class="details-head">
+        <h2 id="details-title" class="pane-title">MD</h2>
+        <button id="viewer-edit" type="button" class="viewer-edit" data-i18n-title="edit_note" data-i18n-aria="edit_note" title="Edit in Orca" aria-label="Edit in Orca"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></button>
+      </div>
+      <p id="viewer-title" class="viewer-title"></p>
+      <article id="viewer-body" class="viewer-body"></article>
+    </section>
 
     <p id="status" class="status" role="status"></p>
   </main>

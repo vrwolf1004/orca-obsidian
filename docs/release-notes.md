@@ -1,5 +1,13 @@
 # Release notes
 
+## 0.6.0
+
+- Sidebar tabs VAULTS, SEARCH and NOTES; tabs slide in from the right over a note graph. Clicking an open tab or the MD area collapses the panel.
+- Note graph built from [[links]]; clicking a node opens the note.
+- Tag clicks run a search; wikilinks open the linked note.
+- Edit in Obsidian for registered vaults, with a clear message when the vault is not registered.
+- Store images and screenshots updated.
+
 ## 0.5.2
 
 - Remove unused code (`getLang`).

@@ -16,12 +16,111 @@ const LANG_KEY = 'lang'
 const PALETTE = ['#7c5cff', '#22b8a6', '#f59e0b', '#ef6f8a', '#3b9eff', '#84cc16']
 
 const list = document.getElementById('vault-list') as HTMLUListElement
-const form = document.getElementById('vault-form') as HTMLFormElement
-const input = document.getElementById('vault-path') as HTMLInputElement
 const status = document.getElementById('status') as HTMLParagraphElement
 const notes = document.getElementById('notes') as HTMLElement
 const tree = document.getElementById('tree') as HTMLUListElement
-const notesVault = document.getElementById('notes-vault') as HTMLParagraphElement
+const notesTitle = document.getElementById('notes-title') as HTMLElement
+const notesPath = document.getElementById('notes-path') as HTMLParagraphElement
+// 바인더 탭: VAULTS / NOTES 중 하나만 보인다
+function showTab(name: string): void {
+  for (const tab of document.querySelectorAll<HTMLButtonElement>('.binder-tab')) tab.setAttribute('aria-selected', String(tab.dataset.tab === name))
+  for (const panel of ['vaults', 'search', 'notes']) (document.getElementById(`tab-${panel}`) as HTMLElement).hidden = panel !== name
+}
+
+// 그래프 탭: 노트를 점, [[링크]]를 선으로 원형에 배치한다. 점을 누르면 그 노트를 연다.
+async function renderGraph(): Promise<void> {
+  const svg = document.getElementById('graph') as unknown as SVGSVGElement
+  svg.replaceChildren()
+  const current = state.vaults.find((v) => v.path === state.current)
+  if (!current) return
+  const { nodes, edges } = (await orca.plugin.request('vault.graph', { root: current.path })) as { nodes: Entry[]; edges: [number, number][] }
+  const NS = 'http://www.w3.org/2000/svg'
+  const pos = nodes.map((_, i) => {
+    const angle = (2 * Math.PI * i) / nodes.length - Math.PI / 2
+    return { x: 160 + 130 * Math.cos(angle), y: 160 + 130 * Math.sin(angle) }
+  })
+  for (const [a, b] of edges) {
+    const line = document.createElementNS(NS, 'line')
+    line.setAttribute('x1', String(pos[a].x))
+    line.setAttribute('y1', String(pos[a].y))
+    line.setAttribute('x2', String(pos[b].x))
+    line.setAttribute('y2', String(pos[b].y))
+    line.setAttribute('class', 'graph-edge')
+    svg.append(line)
+  }
+  nodes.forEach((node, i) => {
+    const g = document.createElementNS(NS, 'g')
+    g.setAttribute('class', 'graph-node')
+    const dot = document.createElementNS(NS, 'circle')
+    dot.setAttribute('cx', String(pos[i].x))
+    dot.setAttribute('cy', String(pos[i].y))
+    dot.setAttribute('r', '6')
+    dot.setAttribute('fill', PALETTE[i % PALETTE.length])
+    const label = document.createElementNS(NS, 'text')
+    label.setAttribute('x', String(pos[i].x))
+    label.setAttribute('y', String(pos[i].y + 18))
+    label.setAttribute('text-anchor', 'middle')
+    label.textContent = node.name.replace(/\.md$/i, '')
+    g.append(dot, label)
+    g.addEventListener('click', () => void openNote(current.path, node))
+    svg.append(g)
+  })
+}
+// 접기: 탭을 누르면 펼쳐서 그 탭을 보여 주고, 열린 탭을 한 번 더 누르면 접는다.
+const binder = document.querySelector('.binder') as HTMLElement
+function setCollapsed(on: boolean): void {
+  binder.classList.toggle('collapsed', on)
+}
+// MD 화면을 누르면 열려 있던 탭 패널을 닫는다
+document.getElementById('viewer')?.addEventListener('click', () => setCollapsed(true))
+for (const tab of document.querySelectorAll<HTMLButtonElement>('.binder-tab')) {
+  tab.addEventListener('click', () => {
+    const name = tab.dataset.tab ?? 'vaults'
+    if (binder.classList.contains('collapsed')) {
+      setCollapsed(false)
+      showTab(name)
+    } else if (tab.getAttribute('aria-selected') === 'true') {
+      setCollapsed(true)
+    } else {
+      showTab(name)
+    }
+  })
+}
+
+const searchInput = document.getElementById('search-input') as HTMLInputElement
+const searchResults = document.getElementById('search-results') as HTMLUListElement
+let searchTimer = 0
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer)
+  searchTimer = window.setTimeout(() => void runSearch(), 300)
+})
+
+// 입력이 멈추면 선택한 볼트에서 노트 이름과 본문을 찾는다
+async function runSearch(): Promise<void> {
+  searchResults.replaceChildren()
+  const current = state.vaults.find((v) => v.path === state.current)
+  const query = searchInput.value.trim()
+  if (!current || !query) return
+  const { results } = (await orca.plugin.request('vault.search', { root: current.path, query })) as { results: Entry[] }
+  if (results.length === 0) {
+    const li = document.createElement('li')
+    li.className = 'no-results'
+    li.textContent = t('no_results')
+    searchResults.append(li)
+    return
+  }
+  for (const r of results) {
+    const li = document.createElement('li')
+    const row = document.createElement('button')
+    row.type = 'button'
+    row.className = 'node note'
+    row.title = r.path
+    row.textContent = r.name
+    row.addEventListener('click', () => void openNote(current.path, { name: r.name, path: r.path, dir: false }))
+    li.append(row)
+    searchResults.append(li)
+  }
+}
 
 let state: VaultState = emptyState
 // 삭제 확인 중인 볼트 경로. null 이면 확인 줄이 없다.
@@ -40,7 +139,6 @@ async function save(next: VaultState): Promise<void> {
 
 // Lucide 아이콘 경로 (ISC 라이선스). 값이 들어가지 않으므로 DOM API 로 만든다.
 const X_ICON = ['M18 6 6 18', 'm6 6 12 12']
-const CHEVRON = ['m9 18 6-6-6-6']
 const FOLDER = ['M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z']
 const FOLDER_OPEN = ['m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2']
 const FILE_TEXT = ['M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z', 'M14 2v4a2 2 0 0 0 2 2h4', 'M10 9H8', 'M16 13H8', 'M16 17H8']
@@ -109,6 +207,13 @@ function render(): void {
     pick.type = 'button'
     pick.className = 'pick'
     pick.textContent = vault.name
+    if (vault.path === state.current) {
+      // 현재 볼트는 항목 안에 경로도 함께 보인다
+      const where = document.createElement('span')
+      where.className = 'pick-path'
+      where.textContent = ` : ${vault.path}`
+      pick.append(where)
+    }
     pick.title = vault.path
     pick.setAttribute('aria-pressed', String(vault.path === state.current))
     pick.addEventListener('click', () => {
@@ -139,17 +244,16 @@ async function renderTree(): Promise<void> {
   const current = state.vaults.find((v) => v.path === state.current)
   notes.hidden = !current
   // 한 줄: 볼트 이름, 콜론, 실제 폴더 경로 (경로는 흐리게)
-  notesVault.replaceChildren()
+  // 볼트 이름은 노란색으로 강조한다
+  notesTitle.replaceChildren('Notes')
   if (current) {
     const name = document.createElement('span')
-    name.className = 'nv-name'
-    name.textContent = current.name
-    const path = document.createElement('span')
-    path.className = 'nv-path'
-    path.textContent = ` : ${current.path}`
-    path.title = current.path
-    notesVault.append(name, path)
+    name.textContent = ` - ${current.name}`
+    name.style.color = '#f59e0b'
+    notesTitle.append(name)
   }
+  notesPath.textContent = current?.path ?? ''
+  void renderGraph()
   if (!current) return
   try {
     tree.append(...(await buildLevel(current.path, current.path)))
@@ -191,7 +295,9 @@ async function treeItem(root: string, entry: Entry): Promise<HTMLLIElement> {
   row.title = entry.path
   // Windows 탐색기처럼: 폴더는 화살표 + 닫힌/열린 폴더 아이콘, 노트는 문서 아이콘.
   if (entry.dir) {
-    row.append(svgIcon(CHEVRON, 'chev'), svgIcon(FOLDER, 'ico ico-closed'), svgIcon(FOLDER_OPEN, 'ico ico-open'))
+    const chev = document.createElement('span')
+    chev.className = 'chev'
+    row.append(chev, svgIcon(FOLDER, 'ico ico-closed'), svgIcon(FOLDER_OPEN, 'ico ico-open'))
   } else {
     const spacer = document.createElement('span')
     spacer.className = 'chev-spacer'
@@ -328,33 +434,49 @@ document.addEventListener('keydown', (event) => {
 })
 
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault()
-  const result = addVault(state, input.value)
+// 입력한 경로나 폴더 선택 창에서 고른 경로를 볼트로 추가한다.
+function addPath(path: string): void {
+  const result = addVault(state, path)
   if (!result.ok) {
     say(result.reason === 'empty' ? t('enter_path') : t('duplicate'))
     return
   }
-  input.value = ''
   void save(result.state)
+}
+
+document.getElementById('pick-folder')?.addEventListener('click', async () => {
+  try {
+    const { path } = (await orca.plugin.request('vault.pickFolder', {})) as { path: string | null }
+    if (path) addPath(path)
+  } catch {
+    say(t('pick_failed'))
+  }
 })
 
 // 노트 보기 (읽기 전용). 내용은 worker 가 읽고, 여기서는 텍스트 조각으로만 그린다.
 const viewer = document.getElementById('viewer') as HTMLElement
 const viewerTitle = document.getElementById('viewer-title') as HTMLSpanElement
 const viewerBody = document.getElementById('viewer-body') as HTMLElement
-document.getElementById('viewer-close')?.addEventListener('click', () => (viewer.hidden = true))
 
 let obsidianInstalled = false
 const obsidianStatus = document.getElementById('obsidian-status') as HTMLParagraphElement
 
+let viewingPath = ''
+// 수정 버튼: 노트를 Orca 편집기 탭으로 연다
+document.getElementById('viewer-edit')?.addEventListener('click', () => {
+  orca.plugin.request('vault.editInObsidian', { root: viewingRoot, path: viewingPath }).catch((error: unknown) => {
+    const code = (error as { code?: string }).code
+    say(t(code === 'unavailable' ? 'edit_need_register' : 'edit_failed'))
+  })
+})
 async function openNote(root: string, entry: Entry): Promise<void> {
   try {
     const { text } = (await orca.plugin.request('vault.read', { root, path: entry.path })) as { text: string }
+    viewingRoot = root
+    viewingPath = entry.path
     viewerTitle.textContent = entry.name
     viewerBody.replaceChildren(...renderBlocks(parseBlocks(text)))
     viewer.hidden = false
-    viewer.scrollIntoView({ block: 'start' })
   } catch (error) {
     say(t('err_note'))
   }
@@ -422,12 +544,32 @@ function cellWith(tag: 'th' | 'td', text: string): HTMLTableCellElement {
   return cell
 }
 
+// 위키링크를 누르면 같은 볼트에서 그 이름의 노트를 연다.
+let viewingRoot = ''
+async function openLink(name: string): Promise<void> {
+  const { path } = (await orca.plugin.request('vault.findNote', { root: viewingRoot, name })) as { path: string | null }
+  if (path) await openNote(viewingRoot, { name: `${name}.md`, path, dir: false })
+  else say(t('link_not_found', { name }))
+}
+
 function renderInline(text: string): Node[] {
   return parseInline(text).map((part: Inline) => {
     if (part.kind === 'text') return document.createTextNode(part.text)
     const el = document.createElement(part.kind === 'strong' ? 'strong' : part.kind === 'em' ? 'em' : part.kind === 'code' ? 'code' : 'span')
     if (part.kind === 'wiki' || part.kind === 'tag') el.className = part.kind
     el.textContent = part.text
+    if (part.kind === 'wiki') {
+      // 별칭([[노트|표시]])과 제목([[노트#절]])을 떼고 노트 이름만 쓴다
+      const name = part.text.split('|')[0].split('#')[0].trim()
+      el.addEventListener('click', () => void openLink(name))
+    }
+    if (part.kind === 'tag') {
+      // 태그를 누르면 SEARCH 에 그 태그를 넣고 찾는다
+      el.addEventListener('click', () => {
+        searchInput.value = part.text
+        void runSearch()
+      })
+    }
     return el
   })
 }
@@ -436,6 +578,7 @@ function renderInline(text: string): Node[] {
 function applyLocale(): void {
   for (const el of document.querySelectorAll<HTMLElement>('[data-i18n]')) el.textContent = t(el.dataset.i18n as Key)
   for (const el of document.querySelectorAll<HTMLElement>('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle as Key)
+  for (const el of document.querySelectorAll<HTMLInputElement>('[data-i18n-placeholder]')) el.placeholder = t(el.dataset.i18nPlaceholder as Key)
   for (const el of document.querySelectorAll<HTMLElement>('[data-i18n-aria]')) el.setAttribute('aria-label', t(el.dataset.i18nAria as Key))
 }
 
@@ -448,6 +591,7 @@ function refreshText(): void {
 }
 
 void (async () => {
+  showTab('vaults')
   const lang = await orca.storage.get(LANG_KEY)
   if (typeof lang === 'string') setLang(lang)
   const { installed } = (await orca.plugin.request('obsidian.status', {})) as { installed: boolean }

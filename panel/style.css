@@ -1,4 +1,7 @@
 :root {
+  /* 접기·펼치기 아이콘: Lucide square-chevron-right / square-chevron-down */
+  --icon-closed: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='m10 8 4 4-4 4'/%3E%3C/svg%3E");
+  --icon-open: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='m8 10 4 4 4-4'/%3E%3C/svg%3E");
   color-scheme: light dark;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --accent: #7c5cff;
@@ -118,9 +121,9 @@ input:focus-visible {
 
 .pick::before {
   content: '';
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
   border: 2px solid var(--dot, var(--muted));
   flex: none;
 }
@@ -149,36 +152,10 @@ input:focus-visible {
   border-color: color-mix(in srgb, #ef6f8a 45%, transparent);
 }
 
-.add {
-  display: flex;
-  gap: 6px;
-}
 
-.add input {
-  flex: 1;
-  min-width: 0;
-  font: inherit;
-  color: inherit;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 10px;
-}
 
-.add input::placeholder {
-  color: var(--muted);
-}
 
-.add button[type='submit'] {
-  background: linear-gradient(135deg, #22b8a6, #7c5cff);
-  border-color: transparent;
-  color: #fff;
-  font-weight: 600;
-}
 
-.add button[type='submit']:hover {
-  filter: brightness(1.08);
-}
 
 .status {
   margin: 0;
@@ -239,11 +216,16 @@ input:focus-visible {
 
 .node .chev,
 .node .chev-spacer {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   flex: none;
   color: var(--muted);
-  transition: transform 0.15s;
+}
+
+.node .chev {
+  background: currentColor;
+  -webkit-mask: var(--icon-closed) center / contain no-repeat;
+  mask: var(--icon-closed) center / contain no-repeat;
 }
 
 .node .chev-spacer {
@@ -251,7 +233,8 @@ input:focus-visible {
 }
 
 .folder[aria-expanded='true'] .chev {
-  transform: rotate(90deg);
+  -webkit-mask: var(--icon-open) center / contain no-repeat;
+  mask: var(--icon-open) center / contain no-repeat;
 }
 
 .folder .ico-closed {
@@ -303,15 +286,7 @@ input:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
-.notes-vault {
-  margin: -4px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-}
 
-.notes-vault:empty {
-  display: none;
-}
 
 
 /* 볼트 카드는 기본으로 접혀 있다 (details 에 open 없음). 노트 카드는 기본으로 펼쳐진다. */
@@ -329,14 +304,19 @@ input:focus-visible {
 }
 
 .pane > summary::before {
-  content: '▸';
+  content: '';
   display: inline-block;
-  width: 10px;
-  transition: transform 0.15s;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--icon-closed) center / contain no-repeat;
+  mask: var(--icon-closed) center / contain no-repeat;
 }
 
 .pane[open] > summary::before {
-  transform: rotate(90deg);
+  -webkit-mask: var(--icon-open) center / contain no-repeat;
+  mask: var(--icon-open) center / contain no-repeat;
 }
 
 .pane > summary:focus-visible {
@@ -346,7 +326,6 @@ input:focus-visible {
 }
 
 /* 아이콘 버튼: 선 아이콘(SVG)을 현재 글자색으로 그린다. */
-.add-btn,
 .remove {
   width: 32px;
   padding: 0;
@@ -354,7 +333,6 @@ input:focus-visible {
   place-items: center;
 }
 
-.add-btn svg,
 .remove svg {
   width: 16px;
   height: 16px;
@@ -428,27 +406,8 @@ input:focus-visible {
 }
 
 /* 볼트 이름 : 경로 한 줄. 경로는 흐리게, 길면 줄임. */
-.notes-vault {
-  margin: -4px 0 0;
-  font-size: 13px;
-  display: flex;
-  min-width: 0;
-  white-space: nowrap;
-}
 
-.nv-name {
-  font-weight: 600;
-  flex: none;
-}
 
-.nv-path {
-  color: var(--muted);
-  font-weight: 400;
-  font-size: 11px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  align-self: center;
-}
 
 /* 노트 보기 (읽기 전용) */
 .viewer {
@@ -539,6 +498,8 @@ input:focus-visible {
 .viewer-body .wiki {
   color: #7c5cff;
   font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 /* Obsidian 설치 상태와 편집 버튼 */
@@ -627,6 +588,7 @@ input:focus-visible {
 
 /* #태그: 알약 모양 */
 .viewer-body .tag {
+  cursor: pointer;
   display: inline-block;
   padding: 0 6px;
   margin: 0 2px;
@@ -691,4 +653,188 @@ input:focus-visible {
 .viewer-body th {
   background: var(--surface);
   font-weight: 600;
+}
+
+/* 탐색기 열기 버튼 */
+.pick-folder {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 검색 블록 */
+.search-input {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.no-results {
+  padding: 4px 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 노트 블록의 볼트 경로: 작게, 길면 줄임 */
+.notes-path {
+  margin: -4px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notes-path:empty {
+  display: none;
+}
+
+
+/* 현재 볼트 항목 안의 경로 */
+.pick-path {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* MD 제목 줄과 수정 버튼 */
+.details-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.viewer-edit {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.viewer-edit svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 바인더 레이아웃: 왼쪽 세로 탭 + 오른쪽 내용 */
+.binder {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.binder-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.binder-tab {
+  writing-mode: vertical-rl;
+  padding: 10px 6px;
+  border-radius: 8px 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.binder-tab[aria-selected='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.binder-body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: flex-grow 0.2s ease, opacity 0.2s ease, visibility 0.2s;
+}
+
+.notes-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 바인더 접기: 내용 숨기고 세로 탭만 남김 */
+/* 접기·펼치기: 내용 폭을 밀어 넣고 빼는 슬라이드 */
+
+@media (prefers-reduced-motion: reduce) {
+  .binder-body {
+    transition: none;
+  }
+}
+
+
+/* 스테이지: 그래프가 배경, 바인더 내용이 그 위에 올라온다 */
+.stage {
+  position: relative;
+}
+
+.graph-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.graph-edge {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.graph-node {
+  cursor: pointer;
+}
+
+.graph-node text {
+  font-size: 9px;
+  fill: CanvasText;
+}
+
+.binder {
+  position: relative;
+  z-index: 2;
+}
+
+.binder-body {
+  position: absolute;
+  top: 0;
+  right: 44px;
+  width: min(300px, calc(100% - 52px));
+  padding: 8px;
+  background: Canvas;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s;
+}
+
+.binder.collapsed .binder-body {
+  transform: translateX(16px);
+  opacity: 0;
+  visibility: hidden;
 }
