@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.6.1
+
+- Folder picker: works when no vault is registered; the VAULTS tab opens by default when the list is empty; spinner until the folder dialog appears.
+- Layout: binder tabs use Times New Roman, 11px, uppercase display; panel borders 2px; the selected vault row no longer has a border; collapsing via a tab click or the MD area.
+- Graph stays inside the tab height.
+
 ## 0.6.0
 
 - Sidebar tabs VAULTS, SEARCH and NOTES; tabs slide in from the right over a note graph. Clicking an open tab or the MD area collapses the panel.

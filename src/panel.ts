@@ -8,7 +8,7 @@ import { highlight } from './highlight.ts'
 type Orca = {
   storage: { get(key: string): Promise<unknown>; set(key: string, value: unknown): Promise<void> }
   // worker(src/worker.ts)의 vault.list 를 부른다. 파일 목록은 여기서만 받는다.
-  plugin: { request(name: string, input: unknown): Promise<unknown> }
+  plugin: { request(name: string, input: unknown): Promise<unknown>; on(event: string, handler: () => void): void }
 }
 const orca = (window as unknown as { orca: Orca }).orca
 const STATE_KEY = 'vaultState'
@@ -169,7 +169,12 @@ function say(message: string): void {
 
 function render(): void {
   list.replaceChildren()
-  if (state.vaults.length === 0) say(t('no_vaults'))
+  if (state.vaults.length === 0) {
+    // 볼트가 없으면 바인더를 펼쳐 VAULTS 를 먼저 보여 준다
+    setCollapsed(false)
+    showTab('vaults')
+    say(t('no_vaults'))
+  }
   else say('')
   // 볼트마다 다른 색 (순서대로 돌려 쓴다). 색은 CSS 변수 --dot 으로 넘긴다.
   state.vaults.forEach((vault, index) => {
@@ -444,12 +449,21 @@ function addPath(path: string): void {
   void save(result.state)
 }
 
-document.getElementById('pick-folder')?.addEventListener('click', async () => {
+// 폴더 선택 창이 열려 있는 동안 버튼에 스피너를 돌린다 (끝나면 멈춘다)
+const pickButton = document.getElementById('pick-folder') as HTMLButtonElement
+// 폴더 선택 창이 뜨면 스피너를 멈춘다 (워커가 picker.opened 를 보낸다)
+orca.plugin.on('picker.opened', () => pickButton.classList.remove('busy'))
+pickButton.addEventListener('click', async () => {
+  pickButton.classList.add('busy')
+  pickButton.disabled = true
   try {
     const { path } = (await orca.plugin.request('vault.pickFolder', {})) as { path: string | null }
     if (path) addPath(path)
   } catch {
     say(t('pick_failed'))
+  } finally {
+    pickButton.classList.remove('busy')
+    pickButton.disabled = false
   }
 })
 

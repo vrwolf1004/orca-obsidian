@@ -150,12 +150,22 @@ export default function activate(orca: {
   orca.panels.handle('obsidian.status', () => ({ installed: existsSync(OBSIDIAN_EXE) }))
 
   // 폴더 선택 창(Windows)을 띄우고 고른 경로를 돌려준다. 취소하면 path 는 null. 스크립트는 고정 문자열이다.
-  orca.panels.handle('vault.pickFolder', () => new Promise((done, fail) => {
-    const script = "Add-Type -AssemblyName System.Windows.Forms; $d = New-Object System.Windows.Forms.FolderBrowserDialog; if ($d.ShowDialog() -eq 'OK') { $d.SelectedPath }"
-    execFile('powershell.exe', ['-NoProfile', '-STA', '-Command', script], { timeout: 120000 }, (error, stdout) => {
-      if (error) return fail(error)
-      done({ path: stdout.trim() || null })
+  // 폴더 선택 창: 창이 뜨면 패널에 picker.opened 를 보내 스피너를 멈추게 하고, 고른 경로를 돌려준다.
+  orca.panels.handle('vault.pickFolder', (_input: never, ctx: { panel: { id: string } }) => new Promise((done, fail) => {
+    // 숨긴 최상위 창을 소유자로 띄워야 폴더 선택 창이 Orca 뒤로 가지 않고 바로 열린다
+    const script = "Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.Form; $f.TopMost = $true; $f.ShowInTaskbar = $false; $f.Opacity = 0; $f.Show(); $f.Activate(); $d = New-Object System.Windows.Forms.FolderBrowserDialog; [Console]::Out.WriteLine('OPEN'); [Console]::Out.Flush(); if ($d.ShowDialog($f) -eq 'OK') { $d.SelectedPath }; $f.Close()"
+    const child = spawn('powershell.exe', ['-NoProfile', '-STA', '-Command', script], { windowsHide: true })
+    let out = ''
+    let opened = false
+    child.stdout.on('data', (chunk: Buffer) => {
+      out += chunk.toString()
+      if (!opened && out.includes('OPEN')) {
+        opened = true
+        orca.panels.post('picker.opened', {}, { panel: ctx.panel.id })
+      }
     })
+    child.on('error', fail)
+    child.on('close', () => done({ path: out.replace('OPEN', '').trim() || null }))
   }))
 
 

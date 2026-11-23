@@ -139,7 +139,7 @@ input:focus-visible {
 }
 
 .pick[aria-pressed='true'] {
-  border-color: var(--dot, var(--accent));
+  border-color: transparent;
   background: color-mix(in srgb, var(--dot, #7c5cff) 18%, transparent);
 }
 
@@ -264,7 +264,7 @@ input:focus-visible {
 
 /* 볼트 목록과 노트 목록을 카드로 나눈다. */
 .pane {
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
   padding: 12px;
@@ -657,8 +657,34 @@ input:focus-visible {
 
 /* 탐색기 열기 버튼 */
 .pick-folder {
+  position: relative;
   width: 100%;
   margin-top: 10px;
+}
+
+/* 폴더 선택 창을 기다리는 동안: 글자 대신 스피너 */
+.pick-folder.busy {
+  color: transparent;
+}
+
+.pick-folder.busy::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid var(--muted);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* 검색 블록 */
@@ -743,11 +769,13 @@ input:focus-visible {
 
 .binder-tab {
   writing-mode: vertical-rl;
+  font-family: 'Times New Roman', Times, Batang, serif;
   padding: 10px 6px;
   border-radius: 8px 0 0 8px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .binder-tab[aria-selected='true'] {
@@ -824,11 +852,6 @@ input:focus-visible {
   top: 0;
   right: 44px;
   width: min(300px, calc(100% - 52px));
-  padding: 8px;
-  background: Canvas;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s;
 }
