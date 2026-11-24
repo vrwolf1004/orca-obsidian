@@ -49,6 +49,11 @@
       "path": "docs/store/screenshot-3.webp",
       "alt": "Vaults tab open over the note graph",
       "caption": "Add and switch vaults"
+    },
+    {
+      "path": "docs/store/screenshot-4.png",
+      "alt": "What's new card listing the changes in each version over the plugin's note graph",
+      "caption": "What's new in each version"
     }
   ]
 }

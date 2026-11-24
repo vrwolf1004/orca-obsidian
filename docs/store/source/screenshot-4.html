@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1280px; height: 900px; background: #121212; font-family: "Segoe UI", "Malgun Gothic", sans-serif; color: #e6e6e6; position: relative; overflow: hidden; }
+  .graph { position: absolute; left: 440px; top: 60px; width: 300px; height: 300px; }
+  .node { position: absolute; border-radius: 50%; }
+  .edge { position: absolute; height: 1px; background: rgba(160, 130, 255, 0.25); transform-origin: 0 0; }
+  .header { position: absolute; left: 16px; top: 16px; display: flex; gap: 12px; align-items: center; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; background: #7c5cff; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .header h1 { font-size: 18px; }
+  .header p { font-size: 13px; color: #9a9a9a; margin-top: 2px; }
+  .tabs { position: absolute; right: 16px; top: 100px; display: flex; flex-direction: column; gap: 8px; }
+  .tab { writing-mode: vertical-rl; transform: rotate(180deg); padding: 14px 6px; border: 2px solid #2e2e2e; border-radius: 6px; background: #1c1c1c; color: #bdbdbd; font-family: "Times New Roman", serif; font-size: 11px; letter-spacing: 1px; }
+  .tab.active { border-color: #7c5cff; color: #fff; }
+  .notes { position: absolute; left: 16px; top: 360px; width: 820px; height: 220px; border: 2px solid #2e2e2e; border-radius: 8px; background: #181818; padding: 18px 20px; color: #5c5c5c; }
+  .notes .t { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .notes .l { height: 9px; background: #262626; border-radius: 4px; margin: 10px 0; }
+  .card { position: absolute; right: 60px; top: 360px; width: 1080px; }
+  .panel { width: 1080px; background: rgba(18, 18, 18, 0.94); border: 2px solid #7c5cff; border-radius: 10px; padding: 26px 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+  .kicker { font-size: 13px; letter-spacing: 2px; color: #a18bff; text-transform: uppercase; }
+  .title { font-size: 30px; font-weight: 700; margin: 6px 0 18px; }
+  .ver { display: flex; gap: 16px; padding: 10px 0; border-top: 1px solid #2e2e2e; }
+  .ver:first-of-type { border-top: 0; }
+  .badge { min-width: 78px; font-size: 14px; font-weight: 700; color: #121212; background: #7c5cff; border-radius: 6px; text-align: center; padding: 4px 0; height: fit-content; }
+  .badge.old { background: #3a3a3a; color: #e6e6e6; }
+  .ver ul { list-style: none; font-size: 15px; line-height: 1.5; color: #d6d6d6; }
+  .ver li::before { content: "• "; color: #a18bff; }
+  .foot { margin-top: 14px; font-size: 12px; color: #7d7d7d; }
+</style>
+</head>
+<body>
+  <!-- decorative graph background -->
+  <div class="graph" id="graph"></div>
+
+  <div class="header">
+    <div class="logo">O</div>
+    <div>
+      <h1>Obsidian for Orca</h1>
+      <p>Browse your vaults and notes from the sidebar</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab">VAULTS</div>
+    <div class="tab">SEARCH</div>
+    <div class="tab active">NOTES</div>
+  </div>
+
+  <div class="notes">
+    <div class="t">Sample note</div>
+    <div class="l" style="width: 60%"></div>
+    <div class="l" style="width: 85%"></div>
+    <div class="l" style="width: 72%"></div>
+    <div class="l" style="width: 40%"></div>
+  </div>
+
+  <div class="card">
+    <div class="panel">
+      <div class="kicker">What's new</div>
+      <div class="title">Obsidian for Orca</div>
+
+      <div class="ver">
+        <div class="badge">v0.6.3</div>
+        <ul>
+          <li>Fixed: folder picker no longer garbles non-English paths</li>
+          <li>Google Drive vaults are supported</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="badge">v0.6.2</div>
+        <ul>
+          <li>Click a #tag to search it in the SEARCH tab</li>
+          <li>Note area dims while a tab is open</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="badge old">v0.6.1</div>
+        <ul>
+          <li>Folder picker works with an empty vault list</li>
+          <li>Layout polish: tab font, borders, graph fits its tab</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="badge old">v0.6.0</div>
+        <ul>
+          <li>VAULTS / SEARCH / NOTES tabs over a note graph</li>
+          <li>Note graph from [[links]]; wikilinks open the note</li>
+          <li>Edit in Obsidian for registered vaults</li>
+        </ul>
+      </div>
+
+      <div class="foot">Full history: docs/release-notes.md</div>
+    </div>
+  </div>
+
+  <script>
+    // Decorative ring of nodes and links (no real note data).
+    const g = document.getElementById('graph');
+    const cx = 150, cy = 150, r = 120, n = 22;
+    const colors = ['#7c5cff', '#4fc3f7', '#ffb74d', '#81c784', '#e57373'];
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+    pts.forEach(([x1, y1], i) => {
+      const [x2, y2] = pts[(i + 3) % n];
+      const len = Math.hypot(x2 - x1, y2 - y1);
+      const ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+      const e = document.createElement('div');
+      e.className = 'edge';
+      e.style.left = x1 + 'px'; e.style.top = y1 + 'px';
+      e.style.width = len + 'px'; e.style.transform = 'rotate(' + ang + 'deg)';
+      g.appendChild(e);
+    });
+    pts.forEach(([x, y], i) => {
+      const d = document.createElement('div');
+      d.className = 'node';
+      const s = 8 + (i % 4) * 2;
+      d.style.width = d.style.height = s + 'px';
+      d.style.left = (x - s / 2) + 'px'; d.style.top = (y - s / 2) + 'px';
+      d.style.background = colors[i % colors.length];
+      g.appendChild(d);
+    });
+  </script>
+</body>
+</html>

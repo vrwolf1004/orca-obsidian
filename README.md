@@ -10,14 +10,22 @@ Browse and read your [Obsidian](https://obsidian.md) vaults from the Orca sideba
 
 ![Help popup](docs/store/screenshot-2.webp)
 
+![What's new in each version](docs/store/screenshot-4.png)
+
 ## Features
 
-- **Vaults**: add a vault folder with `+`, remove it from the list with `×`. Removing never deletes files.
+- **Tabs**: the sidebar has VAULTS, SEARCH and NOTES tabs that slide in over a note graph. Clicking an open tab or the note area collapses the panel.
+- **Vaults**: add a vault folder with `+` (a folder picker opens), remove it from the list with `×`. Removing never deletes files.
 - **Notes**: expand and collapse folders, click a note to read it.
 - **Reading**: headings, lists, checkboxes, tables, code blocks with highlighting, `**bold**`, `*italic*`, `` `code` ``, `[[wikilinks]]` and `#tags`. The YAML front matter at the top is hidden.
 - **Create in place**: right-click a folder for *New folder* or *New note (.md)*. Names are checked before anything is written. Existing items are never overwritten.
 - **Languages**: English, Korean, Japanese, German, Spanish, French and Russian. The language follows Orca's browser language; press **F2** to change it.
+- **Graph**: a note graph built from `[[links]]`; click a node to open the note.
+- **Search**: search notes from the SEARCH tab; clicking a `#tag` runs a search for it.
+- **Links**: `[[wikilinks]]` open the linked note.
+- **Edit in Obsidian**: for vaults registered in Obsidian, open the note there for editing.
 - **Help**: press **Ctrl+H** for the shortcut list.
+- **Release notes**: see [docs/release-notes.md](docs/release-notes.md).
 
 ## Requirements
 
@@ -42,9 +50,8 @@ It does not send data over the network, and it does not write to the vault excep
 
 - Images, links `[text](url)` and numbered-list renumbering are not rendered yet.
 - Table column alignment is ignored; tables are always left-aligned.
-- `[[wikilinks]]` and `#tags` are highlighted but not clickable yet.
 - Syntax highlighting is approximate: it uses keyword lists, not full language grammars.
-- Notes are read-only in the panel. Editing is done in Obsidian or your own editor.
+- Notes are read-only in the panel. Editing is done in Obsidian ("Edit in Obsidian") or your own editor.
 
 ## Development
 
