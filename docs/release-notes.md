@@ -1,5 +1,9 @@
 # Release notes
 
+## 0.6.3
+
+- Folder picker: paths with non-ASCII characters (e.g. Google Drive '내 드라이브') are no longer garbled.
+
 ## 0.6.2
 
 - Clicking a #tag in a note opens the SEARCH tab with that tag.

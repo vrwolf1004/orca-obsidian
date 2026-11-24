@@ -153,7 +153,8 @@ export default function activate(orca: {
   // 폴더 선택 창: 창이 뜨면 패널에 picker.opened 를 보내 스피너를 멈추게 하고, 고른 경로를 돌려준다.
   orca.panels.handle('vault.pickFolder', (_input: never, ctx: { panel: { id: string } }) => new Promise((done, fail) => {
     // 숨긴 최상위 창을 소유자로 띄워야 폴더 선택 창이 Orca 뒤로 가지 않고 바로 열린다
-    const script = "Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.Form; $f.TopMost = $true; $f.ShowInTaskbar = $false; $f.Opacity = 0; $f.Show(); $f.Activate(); $d = New-Object System.Windows.Forms.FolderBrowserDialog; [Console]::Out.WriteLine('OPEN'); [Console]::Out.Flush(); if ($d.ShowDialog($f) -eq 'OK') { $d.SelectedPath }; $f.Close()"
+    // 출력 인코딩을 UTF-8 로 맞춘다: 기본값(CP949)이면 한글 경로가 워커에서 깨진다
+    const script = "[Console]::OutputEncoding = [Text.Encoding]::UTF8; Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.Form; $f.TopMost = $true; $f.ShowInTaskbar = $false; $f.Opacity = 0; $f.Show(); $f.Activate(); $d = New-Object System.Windows.Forms.FolderBrowserDialog; [Console]::Out.WriteLine('OPEN'); [Console]::Out.Flush(); if ($d.ShowDialog($f) -eq 'OK') { $d.SelectedPath }; $f.Close()"
     const child = spawn('powershell.exe', ['-NoProfile', '-STA', '-Command', script], { windowsHide: true })
     let out = ''
     let opened = false
